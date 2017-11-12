@@ -1,0 +1,84 @@
+﻿<UserControl x:Class="XamlToolkitBindingIssue.UsersView"
+             x:Name="UsersViewControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:xamlToolkitBindingIssue="clr-namespace:XamlToolkitBindingIssue"
+             mc:Ignorable="d" 
+             d:DesignHeight="853" d:DesignWidth="1112">
+
+    <UserControl.DataContext>
+        <xamlToolkitBindingIssue:UsersViewModel />
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="InitProgressTemplate" >
+            <StackPanel Margin="16" >
+                <Button 
+                    Command="{Binding ImportDDLComand}"
+                    Margin="20px 10px"
+                    Content="{Binding FriendlyName}" />
+                <Button 
+                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                    Margin="20px 10px"
+                    Content="Cancel" />
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="StandardProgressTemplate" >
+            <StackPanel Margin="16" >
+                <ProgressBar Style="{DynamicResource MaterialDesignCircularProgressBar}"
+                                 HorizontalAlignment="Center"
+                                 Margin="16"
+                                 IsIndeterminate="True"
+                                 Value="{Binding CurrentProgress}" />
+                <TextBlock Text="Fetching users details" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding ElementName=UsersViewControl, Path=DataContext.CurrentProgress}" VerticalAlignment="Center"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ProgressFinishedTemplate" >
+            <StackPanel Margin="16">
+                <TextBlock Text="Done!"  VerticalAlignment="Center"/>
+                <TextBlock Margin="0 10 0 10" 
+                           Text ="{Binding ElementName=UsersViewControl, Path=DataContext.ProgressResult}"/>
+                <Button
+                    HorizontalAlignment="Center"
+                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                    Content="Close" />
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+        <Button 
+                Command="{Binding ShowDialogCommand}"
+                Margin="20px 10px"
+                Content="Import DDL">
+            <Button.CommandParameter>
+                <ContentControl 
+                        Margin="20px"
+                        Width="200px"
+                        Height="160px">
+                    <ContentControl.Style>
+                        <Style TargetType="ContentControl">
+                            <Setter Property="ContentTemplate" Value="{StaticResource InitProgressTemplate}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentProgress}" Value="1">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource StandardProgressTemplate}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentProgress}" Value="100">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource ProgressFinishedTemplate}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
+            </Button.CommandParameter>
+        </Button>
+    </StackPanel>
+
+</UserControl>
+
